@@ -1,0 +1,62 @@
+[
+  {
+    "id": "fly",
+    "keyword": "飞翔",
+    "interpretation": "象征着自由、超越障碍或逃避现实的渴望。如果飞得很高，代表自信和成就；如果飞得很吃力，可能代表生活中的压力。",
+    "category": "动作"
+  },
+  {
+    "id": "fall",
+    "keyword": "坠落",
+    "interpretation": "通常反映了生活中的失控感、焦虑或不安全感。可能暗示着对失败的恐惧，或者在某种关系中感到无助。",
+    "category": "动作"
+  },
+  {
+    "id": "snake",
+    "keyword": "蛇",
+    "interpretation": "具有多重含义。可能代表潜意识的恐惧、诱惑，或者智慧与治愈。脱皮的蛇象征重生和改变。",
+    "category": "动物"
+  },
+  {
+    "id": "water",
+    "keyword": "水",
+    "interpretation": "象征情绪状态。清澈的水代表平静和清晰，浑浊的水代表困惑和情绪混乱。淹水可能代表被情绪淹没。",
+    "category": "自然"
+  },
+  {
+    "id": "exam",
+    "keyword": "考试",
+    "interpretation": "通常与压力、自我评价或对失败的恐惧有关。即使毕业多年，这种梦也常在面临挑战时出现，代表准备不足的焦虑。",
+    "category": "事件"
+  },
+  {
+    "id": "teeth",
+    "keyword": "掉牙",
+    "interpretation": "可能象征着失去力量、衰老或对形象的担忧。也可能代表生活中的重大转变或失去某种支持。",
+    "category": "身体"
+  },
+  {
+    "id": "chase",
+    "keyword": "追逐",
+    "interpretation": "代表逃避某种问题、压力或情感。追你的人或物通常是你试图回避的现实问题的投射。",
+    "category": "动作"
+  },
+  {
+    "id": "house",
+    "keyword": "房子",
+    "interpretation": "代表做梦者自己。不同的房间代表不同的生活领域或性格侧面。破旧的房子可能代表被忽视的自我，新房子代表新的开始。",
+    "category": "物品"
+  },
+  {
+    "id": "naked",
+    "keyword": "裸体",
+    "interpretation": "象征脆弱、羞耻或渴望真实。在公共场合裸体通常反映了对被评判的恐惧或试图隐藏某些秘密。",
+    "category": "身体"
+  },
+  {
+    "id": "death",
+    "keyword": "死亡",
+    "interpretation": "通常不代表实际的死亡，而是象征结束和新的开始。可能代表某种旧习惯、关系或生活阶段的终结。",
+    "category": "事件"
+  }
+]

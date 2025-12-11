@@ -1,0 +1,86 @@
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 60px 20px;
+  min-height: calc(100vh - 200px);
+}
+
+.backLink {
+  display: inline-block;
+  color: #666;
+  text-decoration: none;
+  margin-bottom: 30px;
+  font-size: 0.95rem;
+  transition: color 0.2s;
+}
+
+.backLink:hover {
+  color: #0070f3;
+}
+
+.content {
+  background-color: #fff;
+  border-radius: 20px;
+  padding: 40px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+.header {
+  border-bottom: 1px solid #f0f0f0;
+  padding-bottom: 24px;
+  margin-bottom: 30px;
+}
+
+.keyword {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: #333;
+  margin: 0 0 16px 0;
+}
+
+.category {
+  display: inline-block;
+  background-color: #f0f7ff;
+  color: #0070f3;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+}
+
+.section {
+  margin-bottom: 30px;
+}
+
+.sectionTitle {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #444;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.text {
+  font-size: 1.1rem;
+  line-height: 1.8;
+  color: #555;
+}
+
+.loading {
+  text-align: center;
+  padding: 60px;
+  color: #888;
+}
+
+.notFound {
+  text-align: center;
+  padding: 60px;
+}
+
+.notFound h1 {
+  font-size: 2rem;
+  margin-bottom: 16px;
+}
