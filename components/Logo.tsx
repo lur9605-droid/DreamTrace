@@ -11,53 +11,37 @@ const Logo = ({ width = 40, height = 40, className = '' }: { width?: number; hei
       className={className}
     >
       <defs>
-        <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#FFA07A" /> {/* Peach/Orange */}
-          <stop offset="50%" stopColor="#A893FF" /> {/* Purple */}
-          <stop offset="100%" stopColor="#4D5BCE" /> {/* Blue */}
+        <linearGradient id="logoGradient" x1="0%" y1="100%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor="#FFA07A" /> {/* Orange/Peach at Bottom-Left */}
+          <stop offset="50%" stopColor="#A893FF" /> {/* Purple in Middle */}
+          <stop offset="100%" stopColor="#4D5BCE" /> {/* Blue at Top-Right */}
         </linearGradient>
       </defs>
       
-      {/* 
-         Refined paths to match the reference:
-         1. Outer Moon Line curving into top wave
-         2. Inner Moon Line
-         3. Bottom Wave Line
-         4. Star
-      */}
-
-      {/* Outer Moon Curve -> Top Wave */}
+      {/* Outer Line: Starts top, curves wide left, sweeps to bottom wave */}
       <path 
-        d="M38,12 C20,18 10,40 22,65 C35,90 65,55 90,75" 
+        d="M50,10 C25,20 15,50 25,65 C35,80 65,70 90,80" 
         stroke="url(#logoGradient)" 
-        strokeWidth="3.5"
+        strokeWidth="3"
         strokeLinecap="round"
         fill="none"
       />
 
-      {/* Inner Moon Curve */}
+      {/* Inner Line: Starts top, curves inner left, sweeps to top wave */}
       <path 
-        d="M38,12 C28,30 28,50 45,60" 
+        d="M50,10 C38,30 38,50 48,60 C58,70 78,60 90,68" 
         stroke="url(#logoGradient)" 
-        strokeWidth="3.5"
+        strokeWidth="3"
         strokeLinecap="round"
         fill="none"
       />
 
-      {/* Bottom Wave Line */}
+      {/* 4-Pointed Star with concave sides */}
       <path 
-        d="M25,72 C40,85 70,55 95,80" 
-        stroke="url(#logoGradient)" 
-        strokeWidth="3.5"
-        strokeLinecap="round"
-        fill="none"
-      />
-
-      {/* Star */}
-      <path 
-        d="M55,35 L58,42 L65,45 L58,48 L55,55 L52,48 L45,45 L52,42 Z" 
+        d="M65,30 Q65,40 75,40 Q65,40 65,50 Q65,40 55,40 Q65,40 65,30" 
         stroke="url(#logoGradient)" 
         strokeWidth="3" 
+        strokeLinecap="round"
         strokeLinejoin="round"
         fill="none"
       />
