@@ -31,15 +31,39 @@ export default function ChatInterface({ onBack }: Props) {
   const [dreamText, setDreamText] = useState("");
 
   useEffect(() => {
-    // Initial greeting
+    // Initial greeting with typing effect
+    const greeting = "嗨，我在这里。愿意和我聊聊你昨晚的梦吗？不用着急，我们慢慢来。";
+    let i = 0;
+    
+    // Set initial message placeholder
     setMessages([
       {
         id: "1",
         role: "assistant",
-        content: "你好，我是你的梦境向导。昨晚做了什么梦？试着告诉我，我会陪你一起探索。",
+        content: "",
         type: "text"
       }
     ]);
+    
+    setIsTyping(true);
+    
+    const timer = setInterval(() => {
+      if (i < greeting.length) {
+        setMessages(prev => {
+          const newMsgs = [...prev];
+          if (newMsgs[0]) {
+             newMsgs[0] = { ...newMsgs[0], content: greeting.substring(0, i + 1) };
+          }
+          return newMsgs;
+        });
+        i++;
+      } else {
+        clearInterval(timer);
+        setIsTyping(false);
+      }
+    }, 50); // Speed of typing
+
+    return () => clearInterval(timer);
   }, []);
 
   useEffect(() => {
@@ -60,122 +84,137 @@ export default function ChatInterface({ onBack }: Props) {
     setInput("");
     setIsTyping(true);
 
-    // If dream hasn't been analyzed yet, this input is the dream
+    // 简单对话流程逻辑
+    // 1. 如果还没有分析过梦境，且是第一次输入，假定是梦境描述
     if (!dreamAnalyzed) {
-      const currentDreamText = userMsg.content;
-      setDreamText(currentDreamText);
+        setDreamAnalyzed(true);
+        setDreamText(userMsg.content);
 
-      try {
-        // Simulate delay
-        await new Promise(resolve => setTimeout(resolve, 1500));
-        
-        const res = await parseDream(currentDreamText);
-        
-        setMessages(prev => [
-          ...prev,
-          {
-            id: Date.now().toString() + "_reply",
-            role: "assistant",
-            content: "我正在用心感受你的梦境...有些画面逐渐清晰了。",
-            type: "text"
-          }
-        ]);
-
-        // Show result card
+        // 模拟思考延迟
         setTimeout(() => {
-             setMessages(prev => [
-            ...prev,
-            {
-              id: Date.now().toString() + "_result",
-              role: "assistant",
-              content: "这是我对这个梦的初步解析：",
-              type: "result",
-              data: {
-                  summary: res.summary,
-                  extracted: res.extracted,
-                  hints: res.hints
-              }
-            },
-            {
-                id: Date.now().toString() + "_followup",
+            const reply: Message = {
+                id: Date.now().toString() + "_guide_1",
                 role: "assistant",
-                content: res.hints?.questions?.[0] || "关于这个梦，你还有什么想补充的细节吗？",
-                type: "text"
-            }
-          ]);
-          setIsTyping(false);
-          setDreamAnalyzed(true);
-        }, 1500);
-
-      } catch (e) {
-        console.error(e);
-        setMessages(prev => [
-            ...prev,
-            {
-                id: Date.now().toString() + "_error",
-                role: "assistant",
-                content: "抱歉，我刚刚走神了，没能听清你的梦。能再讲一遍吗？",
-                type: "text"
-            }
-        ]);
-        setIsTyping(false);
-      }
-    } else {
-        // Conversational follow-up (mock)
-        setTimeout(() => {
-            setMessages(prev => [
-                ...prev,
-                {
-                    id: Date.now().toString(),
-                    role: "assistant",
-                    content: "嗯，我明白了。你的感受是真实的，试着深呼吸，接纳这种感觉。还有其他想说的吗？",
-                    type: "text"
-                }
-            ]);
+                content: "嗯……我听到了。这个梦给你带来了什么样的感觉呢？是焦虑、平静，还是有些困惑？"
+            };
+            setMessages(prev => [...prev, reply]);
             setIsTyping(false);
-        }, 1000);
+        }, 1500);
+        return;
+    }
+
+    // 2. 如果已经输入了梦境，正在进行引导对话
+    // 这里简单做一个计数或者根据内容判断是否结束对话
+    // 为了简化，我们假定用户回答了感受之后，AI 再问一个问题，然后生成报告
+    
+    // 简单的状态机模拟
+    const userMsgCount = messages.filter(m => m.role === 'user').length;
+    
+    if (userMsgCount === 1) {
+         // 用户回答了感受
+         setTimeout(() => {
+            const reply: Message = {
+                id: Date.now().toString() + "_guide_2",
+                role: "assistant",
+                content: "原来是这样。梦里的哪些细节让你印象最深刻？或者有什么特别的颜色、声音吗？"
+            };
+            setMessages(prev => [...prev, reply]);
+            setIsTyping(false);
+        }, 1500);
+    } else if (userMsgCount >= 2) {
+        // 假定对话差不多了，生成分析报告
+        setTimeout(async () => {
+            const preReply: Message = {
+                id: Date.now().toString() + "_pre_result",
+                role: "assistant",
+                content: "谢谢你告诉我这些。结合你描述的梦境和感受，我为你整理了一份解析，希望能给你一些启发。"
+            };
+            setMessages(prev => [...prev, preReply]);
+            
+            // Generate analysis
+            const fullText = dreamText + " " + userMsg.content; // Combine context
+            const res = await parseDream(fullText);
+
+            setTimeout(() => {
+                 const resultMsg: Message = {
+                    id: Date.now().toString() + "_result",
+                    role: "assistant",
+                    content: "",
+                    type: "result",
+                    data: {
+                        summary: res.summary,
+                        extracted: res.extracted,
+                        hints: res.hints
+                    }
+                };
+                setMessages(prev => [...prev, resultMsg]);
+                setIsTyping(false);
+            }, 1000);
+
+        }, 1500);
     }
   };
 
   return (
     <div className={styles.container}>
-      <div className={styles.header}>
-        {onBack && <button onClick={onBack} className={styles.backBtn}>← 返回</button>}
-      </div>
-      
-      <div className={styles.messages}>
-        {messages.map(msg => (
-          <div key={msg.id} className={`${styles.message} ${styles[msg.role]}`}>
-            {msg.type === "result" && msg.data ? (
-              <ResultCard 
-                rawText={dreamText}
-                summary={msg.data.summary}
-                extracted={msg.data.extracted}
-                hints={msg.data.hints}
-              />
-            ) : (
-              <div className={styles.bubble}>{msg.content}</div>
+      {/* Messages */}
+      <div className={styles.messagesList}>
+        {messages.map((msg) => (
+          <div
+            key={msg.id}
+            className={`${styles.messageRow} ${
+              msg.role === "user" ? styles.userRow : styles.assistantRow
+            }`}
+          >
+            {msg.role === "assistant" && (
+              <div className={styles.avatar}>✨</div>
             )}
+            <div className={styles.messageContent}>
+              {msg.type === "result" && msg.data ? (
+                <ResultCard
+                  summary={msg.data.summary}
+                  extracted={msg.data.extracted}
+                  hints={msg.data.hints}
+                  rawText={dreamText}
+                />
+              ) : (
+                <div className={styles.bubble}>{msg.content}</div>
+              )}
+            </div>
           </div>
         ))}
         {isTyping && (
-             <div className={`${styles.message} ${styles.assistant}`}>
-                 <div className={styles.bubble}>...</div>
-             </div>
+          <div className={`${styles.messageRow} ${styles.assistantRow}`}>
+            <div className={styles.avatar}>✨</div>
+            <div className={styles.messageContent}>
+              <div className={styles.bubble}>
+                <span className={styles.typingDot}>.</span>
+                <span className={styles.typingDot}>.</span>
+                <span className={styles.typingDot}>.</span>
+              </div>
+            </div>
+          </div>
         )}
         <div ref={messagesEndRef} />
       </div>
 
+      {/* Input Area */}
       <div className={styles.inputArea}>
-        <input 
-          type="text" 
-          value={input}
-          onChange={e => setInput(e.target.value)}
-          onKeyPress={e => e.key === "Enter" && handleSend()}
-          placeholder="输入你的梦境..."
+        <input
           className={styles.input}
+          placeholder="在这里输入..."
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && handleSend()}
+          disabled={isTyping}
         />
-        <button onClick={handleSend} className={styles.sendBtn}>发送</button>
+        <button 
+          className={styles.sendBtn} 
+          onClick={handleSend}
+          disabled={!input.trim() || isTyping}
+        >
+          发送
+        </button>
       </div>
     </div>
   );
