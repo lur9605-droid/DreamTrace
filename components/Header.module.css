@@ -17,11 +17,18 @@
   justify-content: space-between;
 }
 
-.logo a {
+.logoLink {
+  display: flex;
+  align-items: center;
+  gap: 12px;
   font-size: 1.5rem;
   font-weight: bold;
   color: var(--color-text-main);
   text-decoration: none;
+}
+
+.logoIcon {
+  display: block;
 }
 
 .nav {

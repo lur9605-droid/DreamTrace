@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import styles from './Header.module.css';
+import Logo from './Logo';
 
 const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -18,7 +19,10 @@ const Header: React.FC = () => {
     <header className={styles.header}>
       <div className={styles.container}>
         <div className={styles.logo}>
-          <a href="/">梦迹 DreamTrace</a>
+          <a href="/" className={styles.logoLink}>
+            <Logo width={40} height={32} className={styles.logoIcon} />
+            <span>梦迹 DreamTrace</span>
+          </a>
         </div>
         
         <button 
