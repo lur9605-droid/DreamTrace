@@ -26,7 +26,7 @@ export default function TrendsPage() {
     const stats: Record<string, number> = {};
     filteredRecords.forEach(r => {
       r.extracted?.emotions.forEach(e => {
-        stats[e.name] = (stats[e.name] || 0) + 1;
+        stats[typeof e === 'string' ? e : e.name] = (stats[typeof e === 'string' ? e : e.name] || 0) + 1;
       });
     });
     return Object.entries(stats)

@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import styles from './DiaryItem.module.css';
-import { DreamRecord } from '../lib/types';
+import { DreamRecord, EmotionLabel } from '../lib/types';
 import ResultCard from './ResultCard';
 
 interface DiaryItemProps {
@@ -68,7 +68,7 @@ const DiaryItem: React.FC<DiaryItemProps> = ({ record, onDelete, onExport }) => 
             <ResultCard 
               summary={`分析结果包含 ${record.extracted.keywords.length} 个关键词和 ${record.extracted.emotions.length} 个情绪指标。`}
               keywords={record.extracted.keywords}
-              emotions={record.extracted.emotions}
+              emotions={record.extracted.emotions as EmotionLabel[]}
               className={styles.resultCardOverride}
             />
           )}

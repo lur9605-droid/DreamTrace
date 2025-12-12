@@ -5,9 +5,12 @@ export interface EmotionLabel {
 
 export interface Extracted {
   keywords: string[];
-  emotions: EmotionLabel[];
+  emotions: EmotionLabel[] | string[];
   people: string[];
-  locations: string[];
+  locations?: string[];
+  scenes?: string[];
+  actions?: string[];
+  symbols?: string[];
 }
 
 export interface DreamRecord {
