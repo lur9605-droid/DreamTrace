@@ -35,3 +35,28 @@
    cursor: pointer; 
  } 
  .error { color: #b00020; margin-top:8px; }
+
+ .analyzing {
+   display: flex;
+   flex-direction: column;
+   align-items: center;
+   justify-content: center;
+   padding: 60px 0;
+   color: #4D5BCE;
+   font-size: 1.1rem;
+   gap: 20px;
+ }
+ 
+ .spinner {
+   width: 40px;
+   height: 40px;
+   border: 4px solid rgba(77, 91, 206, 0.1);
+   border-top: 4px solid #4D5BCE;
+   border-radius: 50%;
+   animation: spin 1s linear infinite;
+ }
+ 
+ @keyframes spin {
+   0% { transform: rotate(0deg); }
+   100% { transform: rotate(360deg); }
+ }
