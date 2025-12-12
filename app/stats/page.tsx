@@ -18,18 +18,18 @@ import {
 
 // Helper to map emotions to colors and scores
 const getEmotionData = (emotion: string = 'neutral') => {
-  const map: Record<string, { color: string; score: number; label: string }> = {
-    joy: { color: '#FFD700', score: 90, label: 'Joy' },
-    happy: { color: '#FFD700', score: 85, label: 'Happy' },
-    serene: { color: '#98FB98', score: 80, label: 'Serene' },
-    curious: { color: '#87CEFA', score: 60, label: 'Curious' },
-    neutral: { color: '#E0E0E0', score: 50, label: 'Neutral' },
-    anxiety: { color: '#FFA07A', score: 30, label: 'Anxiety' },
-    fear: { color: '#A893FF', score: 20, label: 'Fear' },
-    sadness: { color: '#87CEEB', score: 25, label: 'Sadness' },
-    anger: { color: '#FF6B6B', score: 15, label: 'Anger' },
+  const map: Record<string, { color: string; score: number; label: string; bg: string; icon: string }> = {
+    joy: { color: '#FFD700', score: 90, label: 'Joy', bg: '#FFF9C4', icon: '😄' },
+    happy: { color: '#FFD700', score: 85, label: 'Happy', bg: '#FFF9C4', icon: '😊' },
+    serene: { color: '#98FB98', score: 80, label: 'Serene', bg: '#E8F5E9', icon: '😌' },
+    curious: { color: '#87CEFA', score: 60, label: 'Curious', bg: '#E3F2FD', icon: '🤔' },
+    neutral: { color: '#BDBDBD', score: 50, label: 'Neutral', bg: '#F5F5F5', icon: '😐' },
+    anxiety: { color: '#FFA07A', score: 30, label: 'Anxiety', bg: '#FBE9E7', icon: '😰' },
+    fear: { color: '#A893FF', score: 20, label: 'Fear', bg: '#EDE7F6', icon: '😱' },
+    sadness: { color: '#87CEEB', score: 25, label: 'Sadness', bg: '#E1F5FE', icon: '😢' },
+    anger: { color: '#FF6B6B', score: 15, label: 'Anger', bg: '#FFEBEE', icon: '😠' },
   };
-  return map[emotion.toLowerCase()] || { color: '#DCD6F7', score: 50, label: emotion };
+  return map[emotion.toLowerCase()] || { color: '#DCD6F7', score: 50, label: emotion, bg: '#F3E5F5', icon: '😶' };
 };
 
 export default function StatsPage() {
@@ -75,17 +75,17 @@ export default function StatsPage() {
         {recentRecords.map((r) => {
           const mainEmotion = r.extracted?.emotions?.[0];
           const emotionName = typeof mainEmotion === 'string' ? mainEmotion : mainEmotion?.name;
-          const { color, label } = getEmotionData(emotionName);
+          const { color, label, bg, icon } = getEmotionData(emotionName);
           
           return (
-            <div key={r.id} className={styles.emotionCard} style={{ '--card-accent': color } as React.CSSProperties}>
+            <div key={r.id} className={styles.emotionCard} style={{ '--card-bg': bg } as React.CSSProperties}>
               <div className={styles.cardDate}>
                  {new Date(r.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
               </div>
               <div className={styles.cardLabel}>Main emotion</div>
               <div className={styles.cardEmotion}>{label || 'Unknown'}</div>
-              <div className={styles.cardIcon} style={{ backgroundColor: color }}>
-                {/* Simple visual indicator */}
+              <div className={styles.cardIcon}>
+                {icon}
               </div>
             </div>
           );
