@@ -8,7 +8,7 @@
   flex-direction: column;
 }
 
-.searchSection {
+.headerSection {
   height: 25vh; /* 1/4 of the screen */
   display: flex;
   flex-direction: column;
@@ -18,13 +18,13 @@
   background: transparent;
 }
 
-.title {
-  font-size: 2rem;
+.pageTitle {
+  font-size: 2.5rem;
   font-weight: 700;
   color: #1a1a2e;
   text-align: center;
-  margin-bottom: 24px;
-  line-height: 1.2;
+  margin-bottom: 32px;
+  letter-spacing: -0.02em;
 }
 
 .searchBarWrapper {
@@ -36,187 +36,163 @@
   background: white;
   border-radius: 50px;
   box-shadow: 0 8px 30px rgba(0,0,0,0.05);
-  padding: 8px;
+  padding: 8px 24px;
+  border: 1px solid rgba(0,0,0,0.02);
 }
 
 .searchInput {
   flex: 1;
   border: none;
   background: transparent;
-  padding: 12px 20px;
-  font-size: 1rem;
+  padding: 12px 0;
+  font-size: 1.1rem;
   color: #333;
   outline: none;
 }
 
-.searchButton {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  background: #4a4e69; /* Dark purple/grey */
-  color: white;
-  border: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  font-size: 1.2rem;
-  transition: transform 0.2s ease;
-}
-
-.searchButton:hover {
-  transform: scale(1.05);
+.searchIcon {
+  font-size: 1.4rem;
+  color: #a8a8a8;
+  margin-left: 12px;
 }
 
 .gridSection {
   flex: 1;
-  padding: 40px 20px;
+  padding: 20px 20px 80px;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 24px;
   max-width: 1200px;
   margin: 0 auto;
   width: 100%;
+  align-content: start;
 }
 
 .card {
   background: white;
-  border-radius: 20px;
+  border-radius: 24px;
   padding: 24px;
   box-shadow: 0 4px 20px rgba(0,0,0,0.03);
   cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  min-height: 200px;
+  min-height: 180px;
   border: 1px solid rgba(0,0,0,0.02);
+  position: relative;
+  overflow: hidden;
 }
 
 .card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.06);
+}
+
+.card.expanded {
+  grid-row: span 2; /* Make room when expanded if grid supports it, though content flow handles it naturally */
+  box-shadow: 0 16px 40px rgba(0,0,0,0.08);
+  transform: scale(1.02);
+  z-index: 10;
 }
 
 .cardHeader {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
 }
 
 .cardTitle {
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: #1a1a2e;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #2d3436;
   margin: 0;
 }
 
 .cardCategory {
   font-size: 0.8rem;
-  padding: 4px 10px;
-  background: #f0f0f0;
-  border-radius: 12px;
-  color: #666;
+  padding: 6px 12px;
+  background: #f1f2f6;
+  border-radius: 20px;
+  color: #636e72;
+  font-weight: 500;
 }
 
-.cardPreview {
-  font-size: 0.95rem;
-  color: #666;
-  line-height: 1.5;
-  margin-bottom: 20px;
+.cardContent {
   flex: 1;
+  margin-bottom: 20px;
+}
+
+.shortDesc {
+  font-size: 1rem;
+  color: #636e72;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.fullMeaning {
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: all 0.4s ease;
+}
+
+.fullMeaning.show {
+  max-height: 500px; /* Arbitrary large height */
+  opacity: 1;
+  margin-top: 16px;
+}
+
+.divider {
+  height: 1px;
+  background: #f1f2f6;
+  margin-bottom: 16px;
+}
+
+.fullMeaning p {
+  font-size: 1rem;
+  line-height: 1.8;
+  color: #2d3436;
 }
 
 .cardFooter {
   display: flex;
-  flex-direction: column;
-  gap: 12px;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: auto;
 }
 
-.clickHint {
-  font-size: 0.8rem;
-  color: #999;
+.expandHint {
+  font-size: 0.85rem;
+  color: #a4b0be;
+  transition: color 0.2s;
 }
 
-.dots {
-  display: flex;
-  gap: 6px;
+.card:hover .expandHint {
+  color: #74b9ff;
 }
 
-.dots span {
-  width: 8px;
-  height: 8px;
+.iconWrapper {
+  width: 48px;
+  height: 48px;
+  background: #f8f9fa;
   border-radius: 50%;
-}
-
-.dots span:nth-child(1) { background: #e0f2fe; }
-.dots span:nth-child(2) { background: #bae6fd; }
-.dots span:nth-child(3) { background: #7dd3fc; }
-.dots span:nth-child(4) { background: #38bdf8; }
-
-/* Modal Styles */
-.modalOverlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0,0,0,0.3);
-  backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
-  padding: 20px;
+  font-size: 1.8rem;
+  transition: transform 0.3s ease;
 }
 
-.modalContent {
-  background: white;
-  width: 100%;
-  max-width: 600px;
-  border-radius: 24px;
-  padding: 40px;
-  position: relative;
-  box-shadow: 0 20px 50px rgba(0,0,0,0.2);
-  animation: slideUp 0.3s ease-out;
+.card:hover .iconWrapper {
+  transform: rotate(10deg) scale(1.1);
+  background: #eef2ff;
 }
 
-@keyframes slideUp {
-  from { transform: translateY(20px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
-}
-
-.closeBtn {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  background: none;
-  border: none;
-  font-size: 2rem;
-  cursor: pointer;
-  color: #999;
-  line-height: 1;
-}
-
-.modalTitle {
-  font-size: 2rem;
-  margin-bottom: 8px;
-  color: #1a1a2e;
-}
-
-.modalCategory {
-  display: inline-block;
-  padding: 6px 16px;
-  background: #f3e8ff;
-  color: #7928ca;
-  border-radius: 20px;
-  font-size: 0.9rem;
-  margin-bottom: 24px;
-}
-
-.modalBody {
+.emptyState {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 60px;
+  color: #a4b0be;
   font-size: 1.1rem;
-  line-height: 1.8;
-  color: #444;
 }

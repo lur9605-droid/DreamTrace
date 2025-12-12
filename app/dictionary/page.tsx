@@ -3,35 +3,41 @@
 import React, { useState } from 'react';
 import styles from './page.module.css';
 import BackButton from '@/components/BackButton';
-import { MOCK_DICTIONARY } from '@/lib/mockData';
-import { DictionaryEntry } from '@/lib/types';
+import { DREAM_DICTIONARY, DictionaryItem } from '@/data/dictionary';
 
 export default function DictionaryPage() {
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedEntry, setSelectedEntry] = useState<DictionaryEntry | null>(null);
+  const [expandedId, setExpandedId] = useState<string | null>(null);
 
-  const filteredEntries = MOCK_DICTIONARY.filter(entry => 
-    entry.keyword.includes(searchTerm) || 
-    entry.interpretation.includes(searchTerm)
+  const filteredEntries = DREAM_DICTIONARY.filter(entry => 
+    entry.term.includes(searchTerm) || 
+    entry.meaning.includes(searchTerm)
   );
+
+  const toggleExpand = (id: string) => {
+    if (expandedId === id) {
+      setExpandedId(null);
+    } else {
+      setExpandedId(id);
+    }
+  };
 
   return (
     <div className={styles.container}>
       <BackButton />
       
-      <div className={styles.searchSection}>
-        <h1 className={styles.title}>Search your<br/>dream symbolism..</h1>
+      <div className={styles.headerSection}>
+        <h1 className={styles.pageTitle}>Dream Dictionary</h1>
+        
         <div className={styles.searchBarWrapper}>
           <input 
             type="text" 
-            placeholder="Search your dream symbolism..." 
+            placeholder="Search dream symbols..." 
             className={styles.searchInput}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
-          <button className={styles.searchButton}>
-            🔍
-          </button>
+          <span className={styles.searchIcon}>🔍</span>
         </div>
       </div>
 
@@ -39,38 +45,40 @@ export default function DictionaryPage() {
         {filteredEntries.map(entry => (
           <div 
             key={entry.id} 
-            className={styles.card}
-            onClick={() => setSelectedEntry(entry)}
+            className={`${styles.card} ${expandedId === entry.id ? styles.expanded : ''}`}
+            onClick={() => toggleExpand(entry.id)}
           >
             <div className={styles.cardHeader}>
-              <h3 className={styles.cardTitle}>{entry.keyword}</h3>
+              <h3 className={styles.cardTitle}>{entry.term}</h3>
               <span className={styles.cardCategory}>{entry.category}</span>
             </div>
-            <p className={styles.cardPreview}>
-              {entry.interpretation.substring(0, 40)}...
-            </p>
+            
+            <div className={styles.cardContent}>
+              <p className={styles.shortDesc}>{entry.short}</p>
+              
+              <div className={`${styles.fullMeaning} ${expandedId === entry.id ? styles.show : ''}`}>
+                <div className={styles.divider}></div>
+                <p>{entry.meaning}</p>
+              </div>
+            </div>
+
             <div className={styles.cardFooter}>
-              <span className={styles.clickHint}>Click to expand full content..</span>
-              <div className={styles.dots}>
-                <span></span><span></span><span></span><span></span>
+              <span className={styles.expandHint}>
+                {expandedId === entry.id ? '收起' : '展开解释'}
+              </span>
+              <div className={styles.iconWrapper}>
+                {entry.icon}
               </div>
             </div>
           </div>
         ))}
-      </div>
-
-      {selectedEntry && (
-        <div className={styles.modalOverlay} onClick={() => setSelectedEntry(null)}>
-          <div className={styles.modalContent} onClick={e => e.stopPropagation()}>
-            <button className={styles.closeBtn} onClick={() => setSelectedEntry(null)}>×</button>
-            <h2 className={styles.modalTitle}>{selectedEntry.keyword}</h2>
-            <span className={styles.modalCategory}>{selectedEntry.category}</span>
-            <div className={styles.modalBody}>
-              <p>{selectedEntry.interpretation}</p>
-            </div>
+        
+        {filteredEntries.length === 0 && (
+          <div className={styles.emptyState}>
+            <p>未找到相关意象，换个关键词试试？</p>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }
