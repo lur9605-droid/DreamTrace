@@ -11,10 +11,6 @@ const Header: React.FC = () => {
   };
 
   const navLinks = [
-    { label: '分析', href: '/analysis' },
-    { label: '词典', href: '/dictionary' },
-    { label: '日记', href: '/diary' },
-    { label: '趋势', href: '/trends' },
     { label: '关于', href: '/about' },
   ];
 
