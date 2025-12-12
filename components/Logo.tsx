@@ -11,34 +11,44 @@ const Logo = ({ width = 40, height = 40, className = '' }: { width?: number; hei
       className={className}
     >
       <defs>
-        <linearGradient id="logoGradient" x1="0%" y1="100%" x2="100%" y2="0%">
-          <stop offset="0%" stopColor="#FFA07A" /> {/* Orange/Peach at Bottom-Left */}
-          <stop offset="50%" stopColor="#A893FF" /> {/* Purple in Middle */}
-          <stop offset="100%" stopColor="#4D5BCE" /> {/* Blue at Top-Right */}
+        <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#FFA07A" /> {/* Peach/Orange */}
+          <stop offset="50%" stopColor="#A893FF" /> {/* Purple */}
+          <stop offset="100%" stopColor="#4D5BCE" /> {/* Blue */}
         </linearGradient>
       </defs>
       
-      {/* Outer Line: Starts top, curves wide left, sweeps to bottom wave */}
+      {/* 
+        Outer Curve: 
+        Starts at top tip (48, 15), 
+        Curves out left to form moon back, 
+        Sweeps down and right into the bottom wave 
+      */}
       <path 
-        d="M50,10 C25,20 15,50 25,65 C35,80 65,70 90,80" 
+        d="M48,15 C25,25 15,55 30,70 C45,85 70,65 95,80" 
         stroke="url(#logoGradient)" 
         strokeWidth="3"
         strokeLinecap="round"
         fill="none"
       />
 
-      {/* Inner Line: Starts top, curves inner left, sweeps to top wave */}
+      {/* 
+        Inner Curve: 
+        Starts at top tip (48, 15), 
+        Curves inner left to form moon crescent, 
+        Sweeps right into the top wave (parallel to bottom)
+      */}
       <path 
-        d="M50,10 C38,30 38,50 48,60 C58,70 78,60 90,68" 
+        d="M48,15 C38,35 38,55 50,62 C62,69 80,62 92,70" 
         stroke="url(#logoGradient)" 
         strokeWidth="3"
         strokeLinecap="round"
         fill="none"
       />
 
-      {/* 4-Pointed Star with concave sides */}
+      {/* 4-Pointed Star (Sparkle) */}
       <path 
-        d="M65,30 Q65,40 75,40 Q65,40 65,50 Q65,40 55,40 Q65,40 65,30" 
+        d="M68,35 Q68,42 75,42 Q68,42 68,49 Q68,42 61,42 Q68,42 68,35" 
         stroke="url(#logoGradient)" 
         strokeWidth="3" 
         strokeLinecap="round"
