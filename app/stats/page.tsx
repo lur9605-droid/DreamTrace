@@ -121,7 +121,9 @@ export default function StatsPage() {
                 dy={10}
               />
               <YAxis 
-                hide 
+                axisLine={false}
+                tickLine={false}
+                tick={{ fill: '#999', fontSize: 12 }}
                 domain={[0, 100]} 
               />
               <Tooltip 
