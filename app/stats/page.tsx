@@ -71,13 +71,6 @@ export default function StatsPage() {
         </div>
       </header>
 
-      <div className={styles.searchBar}>
-        <span className={styles.searchIcon}>🔍</span>
-        <input type="text" placeholder="Dream Emotion" className={styles.searchInput} disabled />
-        <span className={styles.filterIcon}>☹️</span>
-        <span className={styles.filterIcon}>🙂</span>
-      </div>
-
       <div className={styles.cardsScroll}>
         {recentRecords.map((r) => {
           const mainEmotion = r.extracted?.emotions?.[0];
