@@ -65,10 +65,6 @@ export default function StatsPage() {
     <div className={styles.container}>
       <header className={styles.header}>
         <h1 className={styles.title}>Dream Emotion Analysis</h1>
-        <div className={styles.userIcon}>
-             {/* Placeholder for user avatar */}
-             <span>👤</span>
-        </div>
       </header>
 
       <div className={styles.cardsScroll}>
