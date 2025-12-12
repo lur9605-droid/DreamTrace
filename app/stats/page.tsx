@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import styles from './page.module.css';
 import { loadRecords } from '@/lib/storage';
 import { DreamRecord } from '@/lib/types';
+import BackButton from '@/components/BackButton';
 import {
   LineChart,
   Line,
@@ -63,6 +64,7 @@ export default function StatsPage() {
 
   return (
     <div className={styles.container}>
+      <BackButton />
       <header className={styles.header}>
         <h1 className={styles.title}>Dream Emotion Analysis</h1>
       </header>

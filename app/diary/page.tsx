@@ -5,6 +5,7 @@ import styles from './page.module.css';
 import { loadRecords } from '@/lib/storage';
 import { DreamRecord } from '@/lib/types';
 import Link from 'next/link';
+import BackButton from '@/components/BackButton';
 
 export default function DiaryPage() {
   const [records, setRecords] = useState<DreamRecord[]>([]);
@@ -42,6 +43,7 @@ export default function DiaryPage() {
 
   return (
     <div className={styles.container}>
+      <BackButton />
       <h1 className={styles.title}>DREAM LOG</h1>
       
       <div className={styles.timeline}>
