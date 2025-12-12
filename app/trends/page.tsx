@@ -19,7 +19,7 @@ export default function TrendsPage() {
     const cutoff = new Date();
     cutoff.setDate(now.getDate() - days);
     
-    return records.filter(r => new Date(r.date) >= cutoff);
+    return records.filter(r => r.date && new Date(r.date) >= cutoff);
   }, [records, days]);
 
   const emotionStats = useMemo(() => {

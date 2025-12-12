@@ -15,14 +15,17 @@ export interface Extracted {
 
 export interface DreamRecord {
   id: string;
-  date: string; // ISO 8601 string YYYY-MM-DD
-  title: string;
-  content: string;
-  clarity: number; // 1-5 or 1-10 scale
-  tags: string[];
-  extracted?: Extracted; // AI analyzed data
-  createdAt: number; // timestamp
-  updatedAt: number; // timestamp
+  createdAt: string; // ISO 8601 string
+  rawText?: string;
+  summary?: string;
+  extracted?: Extracted;
+  // Legacy fields for backward compatibility
+  date?: string; 
+  title?: string;
+  content?: string;
+  clarity?: number;
+  tags?: string[];
+  updatedAt?: number;
 }
 
 export interface DictionaryEntry {

@@ -29,7 +29,7 @@ const DiaryItem: React.FC<DiaryItemProps> = ({ record, onDelete, onExport }) => 
   // Generate a simple summary if not available from extraction (fallback)
   const summary = record.extracted 
     ? `关键词: ${record.extracted.keywords.join(', ')}`
-    : record.content.slice(0, 50) + '...';
+    : (record.content || '').slice(0, 50) + '...';
 
   return (
     <div className={`${styles.card} ${isExpanded ? styles.expanded : ''}`}>
@@ -67,15 +67,14 @@ const DiaryItem: React.FC<DiaryItemProps> = ({ record, onDelete, onExport }) => 
           {record.extracted && (
             <ResultCard 
               summary={`分析结果包含 ${record.extracted.keywords.length} 个关键词和 ${record.extracted.emotions.length} 个情绪指标。`}
-              keywords={record.extracted.keywords}
-              emotions={record.extracted.emotions as EmotionLabel[]}
-              className={styles.resultCardOverride}
+              extracted={record.extracted}
+              rawText={record.content || ''}
             />
           )}
           
           {!record.extracted && (
              <div className={styles.tags}>
-               {record.tags.map(tag => (
+               {record.tags?.map(tag => (
                  <span key={tag} className={styles.tag}>#{tag}</span>
                ))}
              </div>

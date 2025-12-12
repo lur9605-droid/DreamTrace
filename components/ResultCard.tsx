@@ -1,72 +1,89 @@
-'use client';
-
-import React from 'react';
-import styles from './ResultCard.module.css';
-import { EmotionLabel } from '../lib/types';
-
-interface ResultCardProps {
-  title?: string;
-  date?: string;
-  summary: string;
-  keywords: string[];
-  emotions: EmotionLabel[];
-  className?: string;
-}
-
-const ResultCard: React.FC<ResultCardProps> = ({
-  title = "梦境解析结果",
-  date,
-  summary,
-  keywords,
-  emotions,
-  className,
-}) => {
-  return (
-    <div className={`${styles.card} ${className || ''}`}>
-      <div className={styles.header}>
-        <h3 className={styles.title}>{title}</h3>
-        {date && <span className={styles.date}>{date}</span>}
-      </div>
-
-      <div className={styles.section}>
-        <div className={styles.sectionTitle}>摘要</div>
-        <p className={styles.summary}>{summary}</p>
-      </div>
-
-      {keywords.length > 0 && (
-        <div className={styles.section}>
-          <div className={styles.sectionTitle}>关键词</div>
-          <ul className={styles.tagList}>
-            {keywords.map((keyword, index) => (
-              <li key={index} className={styles.tag}>
-                #{keyword}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-
-      {emotions.length > 0 && (
-        <div className={styles.section}>
-          <div className={styles.sectionTitle}>情绪分析</div>
-          <div className={styles.emotionList}>
-            {emotions.map((emotion, index) => (
-              <div key={index} className={styles.emotionItem}>
-                <span className={styles.emotionName}>{emotion.name}</span>
-                <div className={styles.progressBarWrapper}>
-                  <div 
-                    className={styles.progressBar} 
-                    style={{ width: `${Math.min(100, Math.max(0, emotion.score))}%` }}
-                  ></div>
-                </div>
-                <span className={styles.emotionScore}>{emotion.score}%</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
-  );
-};
-
-export default ResultCard;
+"use client"; 
+ import React, { useState } from "react"; 
+ import styles from "./ResultCard.module.css"; 
+ import type { Extracted, DreamRecord } from "@/lib/types"; 
+const uuidv4 = () => crypto.randomUUID();
+ import { saveRecord } from "@/lib/storage"; 
+ 
+ interface Props { 
+   rawText: string; 
+   summary: string; 
+   extracted: Extracted; 
+   hints?: { questions: string[]; comforting: string[]; steps: string[] }; 
+   onSaved?: () => void; 
+ } 
+ 
+ export default function ResultCard({ rawText, summary, extracted, hints, onSaved }: Props) { 
+   const [saved, setSaved] = useState(false); 
+ 
+   const handleSave = () => { 
+     const record: DreamRecord = { 
+       id: uuidv4(), 
+       createdAt: new Date().toISOString(), 
+       rawText, 
+       extracted, 
+       summary 
+     }; 
+     saveRecord(record); 
+     setSaved(true); 
+     onSaved?.(); 
+   }; 
+ 
+   return ( 
+     <div className={styles.card}> 
+       <h3 className={styles.title}>解析结果</h3> 
+       <p className={styles.summary}>{summary}</p> 
+ 
+       <div className={styles.row}> 
+         <div> 
+           <strong>情绪线索</strong> 
+           <div className={styles.emotions}> 
+             {extracted.emotions.map((e) => ( 
+               <span key={typeof e === 'string' ? e : e.name} className={styles.bubble}>
+                 {typeof e === 'string' ? e : `${e.name} (${e.score}%)`}
+               </span> 
+             ))} 
+           </div> 
+         </div> 
+         <div> 
+           <strong>关键词</strong> 
+           <div className={styles.keywords}> 
+             {extracted.keywords.map((k) => ( 
+               <span key={k} className={styles.keyword}>{k}</span> 
+             ))} 
+           </div> 
+         </div> 
+       </div> 
+ 
+       <div className={styles.extracted}> 
+         {extracted.scenes && extracted.scenes.length > 0 && <div><strong>场景：</strong>{extracted.scenes.join("、")}</div>} 
+         {extracted.people && extracted.people.length > 0 && <div><strong>人物：</strong>{extracted.people.join("、")}</div>} 
+         {extracted.actions && extracted.actions.length > 0 && <div><strong>动作：</strong>{extracted.actions.join("、")}</div>} 
+         {extracted.symbols && extracted.symbols.length > 0 && <div><strong>象征：</strong>{extracted.symbols.join("、")}</div>} 
+       </div> 
+ 
+       {hints && ( 
+         <div className={styles.hints}> 
+           <strong>引导问题</strong> 
+           <ul> 
+             {hints.questions.map((q) => <li key={q}>{q}</li>)} 
+           </ul> 
+           <strong>温柔安抚</strong> 
+           <ul> 
+             {hints.comforting.map((c) => <li key={c}>{c}</li>)} 
+           </ul> 
+           <strong>轻量建议</strong> 
+           <ul> 
+             {hints.steps.map((s) => <li key={s}>{s}</li>)} 
+           </ul> 
+         </div> 
+       )} 
+ 
+       <div className={styles.actions}> 
+         <button className={styles.saveBtn} onClick={handleSave} disabled={saved}> 
+           {saved ? "已保存到日记" : "把它保存到我的梦境日记"} 
+         </button> 
+       </div> 
+     </div> 
+   ); 
+ }
