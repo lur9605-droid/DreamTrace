@@ -5,6 +5,7 @@
   min-height: 100vh;
   /* background: linear-gradient(135deg, #e0f2fe 0%, #f3e8ff 100%); */
   background: transparent;
+  position: relative;
 }
 
 .title {
