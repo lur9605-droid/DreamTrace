@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from "react";
 import styles from "./ChatInterface.module.css";
 import { Extracted } from "@/lib/types";
 import ResultCard from "./ResultCard";
-import { parseDream } from "@/lib/mockAI";
+import { parseDream, chatWithAI, ChatContext } from "@/lib/mockAI";
 
 interface Message {
   id: string;
@@ -27,8 +27,13 @@ export default function ChatInterface({ onBack }: Props) {
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const [dreamAnalyzed, setDreamAnalyzed] = useState(false);
-  const [dreamText, setDreamText] = useState("");
+  
+  // Chat Context State
+  const [chatContext, setChatContext] = useState<ChatContext>({
+    stage: 'initial',
+    dreamText: "",
+    turnCount: 0
+  });
 
   useEffect(() => {
     // Initial greeting with typing effect
@@ -84,57 +89,28 @@ export default function ChatInterface({ onBack }: Props) {
     setInput("");
     setIsTyping(true);
 
-    // 简单对话流程逻辑
-    // 1. 如果还没有分析过梦境，且是第一次输入，假定是梦境描述
-    if (!dreamAnalyzed) {
-        setDreamAnalyzed(true);
-        setDreamText(userMsg.content);
+    try {
+        // Simulate thinking delay
+        await new Promise(resolve => setTimeout(resolve, 1500));
 
-        // 模拟思考延迟
-        setTimeout(() => {
-            const reply: Message = {
-                id: Date.now().toString() + "_guide_1",
-                role: "assistant",
-                content: "嗯……我听到了。这个梦给你带来了什么样的感觉呢？是焦虑、平静，还是有些困惑？"
-            };
-            setMessages(prev => [...prev, reply]);
-            setIsTyping(false);
-        }, 1500);
-        return;
-    }
+        const { text, newContext, action } = await chatWithAI(userMsg.content, chatContext);
+        setChatContext(newContext);
 
-    // 2. 如果已经输入了梦境，正在进行引导对话
-    // 这里简单做一个计数或者根据内容判断是否结束对话
-    // 为了简化，我们假定用户回答了感受之后，AI 再问一个问题，然后生成报告
-    
-    // 简单的状态机模拟
-    const userMsgCount = messages.filter(m => m.role === 'user').length;
-    
-    if (userMsgCount === 1) {
-         // 用户回答了感受
-         setTimeout(() => {
-            const reply: Message = {
-                id: Date.now().toString() + "_guide_2",
-                role: "assistant",
-                content: "原来是这样。梦里的哪些细节让你印象最深刻？或者有什么特别的颜色、声音吗？"
-            };
-            setMessages(prev => [...prev, reply]);
-            setIsTyping(false);
-        }, 1500);
-    } else if (userMsgCount >= 2) {
-        // 假定对话差不多了，生成分析报告
-        setTimeout(async () => {
-            const preReply: Message = {
-                id: Date.now().toString() + "_pre_result",
-                role: "assistant",
-                content: "谢谢你告诉我这些。结合你描述的梦境和感受，我为你整理了一份解析，希望能给你一些启发。"
-            };
-            setMessages(prev => [...prev, preReply]);
+        if (action === 'show_analysis') {
+            // Show the transition text first
+             setMessages(prev => [
+                ...prev,
+                {
+                    id: Date.now().toString() + "_reply",
+                    role: "assistant",
+                    content: text,
+                    type: "text"
+                }
+            ]);
+
+            // Then generate and show analysis
+            const res = await parseDream(newContext.dreamText);
             
-            // Generate analysis
-            const fullText = dreamText + " " + userMsg.content; // Combine context
-            const res = await parseDream(fullText);
-
             setTimeout(() => {
                  const resultMsg: Message = {
                     id: Date.now().toString() + "_result",
@@ -151,7 +127,32 @@ export default function ChatInterface({ onBack }: Props) {
                 setIsTyping(false);
             }, 1000);
 
-        }, 1500);
+        } else {
+            // Normal conversation reply
+            setMessages(prev => [
+                ...prev,
+                {
+                    id: Date.now().toString() + "_reply",
+                    role: "assistant",
+                    content: text,
+                    type: "text"
+                }
+            ]);
+            setIsTyping(false);
+        }
+
+    } catch (err) {
+        console.error(err);
+        setMessages(prev => [
+            ...prev,
+            {
+                id: Date.now().toString() + "_error",
+                role: "assistant",
+                content: "抱歉，我好像走神了...能再和我说一遍吗？",
+                type: "text"
+            }
+        ]);
+        setIsTyping(false);
     }
   };
 
@@ -175,7 +176,7 @@ export default function ChatInterface({ onBack }: Props) {
                   summary={msg.data.summary}
                   extracted={msg.data.extracted}
                   hints={msg.data.hints}
-                  rawText={dreamText}
+                  rawText={chatContext.dreamText}
                 />
               ) : (
                 <div className={styles.bubble}>{msg.content}</div>
@@ -206,12 +207,12 @@ export default function ChatInterface({ onBack }: Props) {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && handleSend()}
-          disabled={isTyping}
+          disabled={isTyping || chatContext.stage === 'ready_for_analysis'}
         />
         <button 
           className={styles.sendBtn} 
           onClick={handleSend}
-          disabled={!input.trim() || isTyping}
+          disabled={!input.trim() || isTyping || chatContext.stage === 'ready_for_analysis'}
         >
           发送
         </button>
