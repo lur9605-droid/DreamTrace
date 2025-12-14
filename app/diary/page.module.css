@@ -81,6 +81,12 @@
   font-size: 1rem;
 }
 
+.stateHint {
+  align-self: flex-start;
+  font-size: 0.85rem;
+  color: #8fa0c0;
+}
+
 .emotionBadge {
   align-self: flex-end;
   padding: 6px 16px;

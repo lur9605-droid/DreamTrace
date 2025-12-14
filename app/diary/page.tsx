@@ -58,11 +58,19 @@ export default function DiaryPage() {
                 {index % 3 === 0 ? '🌙' : index % 3 === 1 ? '✨' : '☁️'}
               </div>
               
-              <div className={styles.card}>
+              <Link href={`/analysis?resume=${record.id}`} className={styles.card}>
                 <div className={styles.date}>{formatDate(record.createdAt)}</div>
                 <p className={styles.content}>
                   {record.summary || record.rawText || record.content}
                 </p>
+                {(() => {
+                  const inferredInProgress = record.status === 'in_progress' || (!record.summary && !record.extracted);
+                  return (
+                    <span className={styles.stateHint}>
+                      {inferredInProgress ? '还可以继续聊聊' : '已生成解析'}
+                    </span>
+                  );
+                })()}
                 
                 {emotionLabel && (
                   <span 
@@ -72,7 +80,7 @@ export default function DiaryPage() {
                     {emotionLabel}
                   </span>
                 )}
-              </div>
+              </Link>
             </div>
           );
         })}

@@ -19,6 +19,8 @@ export interface DreamRecord {
   rawText?: string;
   summary?: string;
   extracted?: Extracted;
+  status?: "in_progress" | "completed";
+  messages?: { role: "user" | "assistant"; content: string; ts: string }[];
   // Legacy fields for backward compatibility
   date?: string; 
   title?: string;

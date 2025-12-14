@@ -16,18 +16,20 @@ const uuidv4 = () => crypto.randomUUID();
  export default function ResultCard({ rawText, summary, extracted, hints, onSaved }: Props) { 
    const [saved, setSaved] = useState(false); 
  
-   const handleSave = () => { 
-     const record: DreamRecord = { 
-       id: uuidv4(), 
-       createdAt: new Date().toISOString(), 
-       rawText, 
-       extracted, 
-       summary 
-     }; 
-     saveRecord(record); 
-     setSaved(true); 
-     onSaved?.(); 
-   }; 
+  const handleSave = () => { 
+    const record: DreamRecord = { 
+      id: uuidv4(), 
+      createdAt: new Date().toISOString(), 
+      rawText, 
+      extracted, 
+      summary,
+      status: "completed",
+      updatedAt: Date.now()
+    }; 
+    saveRecord(record); 
+    setSaved(true); 
+    onSaved?.(); 
+  }; 
  
    return ( 
      <div className={styles.card}> 

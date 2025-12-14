@@ -18,8 +18,10 @@ export default function TrendsPage() {
     const now = new Date();
     const cutoff = new Date();
     cutoff.setDate(now.getDate() - days);
-    
-    return records.filter(r => r.date && new Date(r.date) >= cutoff);
+    return records.filter(r => {
+      const d = r.date ? new Date(r.date) : (r.createdAt ? new Date(r.createdAt) : null);
+      return d ? d >= cutoff : false;
+    });
   }, [records, days]);
 
   const emotionStats = useMemo(() => {
@@ -55,6 +57,13 @@ export default function TrendsPage() {
       '恐惧': '#ef4444',
       '悲伤': '#6366f1',
       '愤怒': '#dc2626',
+      'joy': '#10b981',
+      'serene': '#3b82f6',
+      'anxiety': '#f59e0b',
+      'fear': '#ef4444',
+      'sadness': '#6366f1',
+      'anger': '#dc2626',
+      'neutral': '#9ca3af'
     };
     return colors[emotion] || '#888888';
   }

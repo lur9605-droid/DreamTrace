@@ -48,6 +48,22 @@ export const saveRecord = (record: DreamRecord): void => {
   }
 };
 
+export const updateSaveRecord = (id: string, updates: Partial<DreamRecord>): void => {
+  if (typeof window === 'undefined') return;
+
+  try {
+    const records = loadRecords();
+    const index = records.findIndex(r => r.id === id);
+    if (index >= 0) {
+      const merged = { ...records[index], ...updates } as DreamRecord;
+      records[index] = merged;
+      localStorage.setItem(LS_KEY, JSON.stringify(records));
+    }
+  } catch (error) {
+    console.error("Failed to update record in localStorage:", error);
+  }
+};
+
 /**
  * Delete a dream record by its ID.
  */
