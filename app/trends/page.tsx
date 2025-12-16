@@ -24,30 +24,38 @@ export default function TrendsPage() {
     });
   }, [records, days]);
 
-  const emotionStats = useMemo(() => {
-    const stats: Record<string, number> = {};
-    filteredRecords.forEach(r => {
-      r.extracted?.emotions.forEach(e => {
-        stats[typeof e === 'string' ? e : e.name] = (stats[typeof e === 'string' ? e : e.name] || 0) + 1;
-      });
+  const emotionTimeline = useMemo(() => {
+    // 1. Filter completed records with emotions
+    const validRecords = filteredRecords
+      .filter(r => r.status === 'completed' && r.extracted?.emotions?.length)
+      .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+
+    // 2. Map to chart format
+    return validRecords.map(r => {
+      const mainEmotion = r.extracted?.emotions[0];
+      const emotionName = typeof mainEmotion === 'string' ? mainEmotion : mainEmotion?.name;
+      return {
+        date: new Date(r.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+        value: getEmotionValue(emotionName || ''),
+        emotion: emotionName,
+        color: getColorForEmotion(emotionName || ''),
+        summary: r.summary || '无摘要'
+      };
     });
-    return Object.entries(stats)
-      .map(([label, value]) => ({ label, value, color: getColorForEmotion(label) }))
-      .sort((a, b) => b.value - a.value);
   }, [filteredRecords]);
 
-  const keywordStats = useMemo(() => {
-    const stats: Record<string, number> = {};
-    filteredRecords.forEach(r => {
-      r.extracted?.keywords.forEach(k => {
-        stats[k] = (stats[k] || 0) + 1;
-      });
-    });
-    return Object.entries(stats)
-      .map(([label, value]) => ({ label, value }))
-      .sort((a, b) => b.value - a.value)
-      .slice(0, 10);
-  }, [filteredRecords]);
+  function getEmotionValue(emotion: string) {
+    const values: Record<string, number> = {
+      '快乐': 9, 'joy': 9,
+      '平静': 7, 'serene': 7,
+      'neutral': 5,
+      '焦虑': 3, 'anxiety': 3,
+      '悲伤': 2, 'sadness': 2,
+      '恐惧': 2, 'fear': 2,
+      '愤怒': 1, 'anger': 1
+    };
+    return values[emotion] || 5;
+  }
 
   function getColorForEmotion(emotion: string) {
     const colors: Record<string, string> = {
@@ -67,6 +75,21 @@ export default function TrendsPage() {
     };
     return colors[emotion] || '#888888';
   }
+
+  const keywordStats = useMemo(() => {
+    const stats: Record<string, number> = {};
+    filteredRecords.forEach(r => {
+      if (r.extracted?.keywords) {
+        r.extracted.keywords.forEach((k: string) => {
+          stats[k] = (stats[k] || 0) + 1;
+        });
+      }
+    });
+    
+    return Object.entries(stats)
+      .map(([label, value]) => ({ label, value }))
+      .sort((a, b) => b.value - a.value);
+  }, [filteredRecords]);
 
   return (
     <div className={styles.container}>
@@ -95,20 +118,29 @@ export default function TrendsPage() {
         </div>
       ) : (
         <div className={styles.statsGrid}>
-          <div className={styles.card}>
-            <h2 className={styles.cardTitle}>情绪分布</h2>
+          <div className={styles.card} style={{ gridColumn: '1 / -1' }}>
+            <h2 className={styles.cardTitle}>情绪变化轨迹</h2>
             <TrendChart 
-              data={emotionStats} 
-              width={400} 
+              data={emotionTimeline} 
+              width={800} 
               height={300} 
+              type="line"
             />
           </div>
 
           <div className={styles.card}>
+            <h2 className={styles.cardTitle}>情绪分布</h2>
+            {/* Keeping the pie/bar chart logic for distribution if needed, or remove */}
+            <div style={{ padding: 20, textAlign: 'center', color: '#666' }}>
+              （分布图表待更新）
+            </div>
+          </div>
+
+          <div className={styles.card}>
             <h2 className={styles.cardTitle}>高频关键词 Top 10</h2>
-            {keywordStats.length > 0 ? (
+            {keywordStats?.length > 0 ? (
               <ul className={styles.keywordList}>
-                {keywordStats.map((item, index) => (
+                {keywordStats?.slice(0, 10).map((item: { label: string; value: number }, index: number) => (
                   <li key={item.label} className={styles.keywordItem}>
                     <div style={{ display: 'flex', alignItems: 'center' }}>
                       <span className={styles.keywordRank}>{(index + 1).toString()}</span>
