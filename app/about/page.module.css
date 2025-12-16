@@ -1,4 +1,140 @@
 .container {
-  padding: 20px;
-  position: relative;
+  padding: 48px 16px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.header {
+  margin-bottom: 40px;
+  text-align: center;
+}
+.brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.logoIcon {
+  font-size: 2.2rem;
+}
+.title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0;
+}
+.subtitle {
+  color: #6b7280;
+  font-size: 1.05rem;
+}
+
+/* Card Style */
+.card {
+  background: white;
+  border-radius: 20px;
+  padding: 32px;
+  margin-bottom: 32px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.03);
+  border: 1px solid rgba(0,0,0,0.02);
+}
+
+.cardTitle {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1f2937;
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+/* Belief Grid */
+.beliefGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+}
+.beliefItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 16px;
+  background: #fcfdfe;
+  border-radius: 12px;
+  transition: transform 0.2s;
+}
+.beliefItem:hover {
+  transform: translateY(-2px);
+  background: #f8fafc;
+}
+.beliefIcon {
+  font-size: 1.8rem;
+  flex-shrink: 0;
+  background: #f0f4ff;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+}
+.beliefContent h3 {
+  font-size: 1rem;
+  color: #374151;
+  margin: 0 0 6px 0;
+  font-weight: 600;
+}
+.beliefContent p {
+  font-size: 0.9rem;
+  color: #6b7280;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Feature Grid */
+.featureGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 24px;
+}
+.featureItem {
+  padding: 24px;
+  border: 1px solid rgba(0,0,0,0.04);
+  border-radius: 16px;
+  background: #ffffff;
+}
+.featureHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.featureIcon {
+  font-size: 1.4rem;
+}
+.featureName {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0;
+}
+.featureSlogan {
+  font-size: 0.9rem;
+  color: #4D5BCE;
+  margin: 0 0 12px 0;
+  font-weight: 500;
+}
+.featureText {
+  font-size: 0.9rem;
+  color: #6b7280;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.footerNote {
+  text-align: center;
+  color: #94a3b8;
+  font-size: 0.95rem;
+  margin-top: 48px;
+  padding: 0 20px;
+  line-height: 1.6;
 }

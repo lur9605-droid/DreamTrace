@@ -72,12 +72,17 @@ export default function DiaryPage() {
                   );
                 })()}
                 
-                {emotionLabel && (
+                {emotionLabel && emotionLabel !== 'neutral' && (
                   <span 
                     className={styles.emotionBadge}
                     style={{ backgroundColor: getEmotionColor(emotionLabel) }}
                   >
                     {emotionLabel}
+                  </span>
+                )}
+                {(!emotionLabel || emotionLabel === 'neutral') && (
+                  <span className={styles.stateHint} style={{ marginLeft: 8 }}>
+                    {record.status === 'completed' ? '情绪未识别' : '未分析'}
                   </span>
                 )}
               </Link>

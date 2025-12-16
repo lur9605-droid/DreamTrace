@@ -1,5 +1,5 @@
 .container {
-  max-width: 900px;
+  max-width: 1200px;
   margin: 0 auto;
   padding: 32px 16px;
 }
@@ -168,6 +168,13 @@
   box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
+/* Emotion Curve with axes */
+.curveContainer {
+  display: block;
+  width: 100%;
+  margin: 24px 0 8px;
+}
+
 .tagsRow {
   display: flex;
   gap: 8px;
@@ -185,6 +192,8 @@
 }
 
 .footerNote {
-  color: #6b7280;
+  color: #4D5BCE;
   font-size: 0.95rem;
+  margin-left: 56px;
+  opacity: 0.9;
 }

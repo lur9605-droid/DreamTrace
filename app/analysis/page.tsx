@@ -73,7 +73,8 @@ export default function AnalysisPage() {
           rawText: `用户：${input}`,
           status: "in_progress",
           messages: [{ role: "user", content: input, ts: new Date().toISOString() }],
-          updatedAt: Date.now()
+          updatedAt: Date.now(),
+          extracted: undefined // 显式置空，不写 neutral
         };
         saveRecord(record);
         setCurrentRecordId(id);
@@ -104,7 +105,11 @@ export default function AnalysisPage() {
           updateSaveRecord(currentRecordId, { messages: newMessages as { role: "user" | "assistant"; content: string; ts: string }[], rawText: newRaw, updatedAt: Date.now() });
           try {
             const analysis = await parseDream(newRaw);
-            updateSaveRecord(currentRecordId, { extracted: analysis.extracted, summary: analysis.summary, updatedAt: Date.now() });
+            // 只有当解析出有效情绪且不是默认 neutral 时，才更新到记录中
+            const hasValidEmotion = analysis.extracted.emotions.length > 0 && analysis.extracted.emotions[0] !== 'neutral';
+            if (hasValidEmotion) {
+              updateSaveRecord(currentRecordId, { extracted: analysis.extracted, summary: analysis.summary, updatedAt: Date.now(), status: "completed" });
+            }
           } catch {}
         }
       } else {
@@ -119,7 +124,11 @@ export default function AnalysisPage() {
           updateSaveRecord(currentRecordId, { messages: newMessages as { role: "user" | "assistant"; content: string; ts: string }[], rawText: newRaw, updatedAt: Date.now() });
           try {
             const analysis = await parseDream(newRaw);
-            updateSaveRecord(currentRecordId, { extracted: analysis.extracted, summary: analysis.summary, updatedAt: Date.now() });
+            // 只有当解析出有效情绪且不是默认 neutral 时，才更新到记录中
+            const hasValidEmotion = analysis.extracted.emotions.length > 0 && analysis.extracted.emotions[0] !== 'neutral';
+            if (hasValidEmotion) {
+              updateSaveRecord(currentRecordId, { extracted: analysis.extracted, summary: analysis.summary, updatedAt: Date.now(), status: "completed" });
+            }
           } catch {}
         }
       }
@@ -134,7 +143,11 @@ export default function AnalysisPage() {
         updateSaveRecord(currentRecordId, { messages: newMessages as { role: "user" | "assistant"; content: string; ts: string }[], rawText: newRaw, updatedAt: Date.now() });
         try {
           const analysis = await parseDream(newRaw);
-          updateSaveRecord(currentRecordId, { extracted: analysis.extracted, summary: analysis.summary, updatedAt: Date.now() });
+          // 只有当解析出有效情绪且不是默认 neutral 时，才更新到记录中
+          const hasValidEmotion = analysis.extracted.emotions.length > 0 && analysis.extracted.emotions[0] !== 'neutral';
+          if (hasValidEmotion) {
+            updateSaveRecord(currentRecordId, { extracted: analysis.extracted, summary: analysis.summary, updatedAt: Date.now(), status: "completed" });
+          }
         } catch {}
       }
     } finally {
@@ -152,7 +165,7 @@ export default function AnalysisPage() {
       const existing = records.find(r => r.id === currentRecordId);
       const newMessages = [...(existing?.messages || []), { role: "assistant", content: gentle, ts: new Date().toISOString() }];
       const newRaw = `${(existing?.rawText || "").trim()}\nAI：${gentle}`.trim();
-      updateSaveRecord(currentRecordId, { messages: newMessages as { role: "user" | "assistant"; content: string; ts: string }[], rawText: newRaw, updatedAt: Date.now() });
+
     }
   };
 
