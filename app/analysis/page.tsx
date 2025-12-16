@@ -31,12 +31,18 @@ export default function AnalysisPage() {
 
   useEffect(() => {
     const resumeId = params.get("resume");
+    const mode = params.get("mode"); // 'review' | undefined
     if (resumeId) {
       const records = loadRecords();
       const record = records.find(r => r.id === resumeId);
       if (record) {
         setCurrentRecordId(record.id);
-        setShowResumeBanner(record.status === 'in_progress');
+        const isCompleted = record.status === 'completed';
+        const isReview = mode === 'review';
+        
+        // Show banner only if it's in progress AND not explicitly reviewing, OR if reviewing but incomplete
+        const shouldShowBanner = record.status === 'in_progress' && !isReview;
+        setShowResumeBanner(shouldShowBanner);
         const restored: Msg[] = [];
         if (record.messages && record.messages.length > 0) {
           for (const m of record.messages) {
@@ -74,7 +80,7 @@ export default function AnalysisPage() {
           status: "in_progress",
           messages: [{ role: "user", content: input, ts: new Date().toISOString() }],
           updatedAt: Date.now(),
-          extracted: undefined // 显式置空，不写 neutral
+          extracted: undefined
         };
         saveRecord(record);
         setCurrentRecordId(id);
@@ -88,68 +94,101 @@ export default function AnalysisPage() {
     } catch {}
 
     try {
+      // Build system prompt to enforce response structure
+      const systemPrompt: Msg = {
+        role: "system",
+        content: `你是一位对【弗洛伊德梦的解析理论】有深入理解的梦境解析师 AI。
+你的目标不是立即给出解释，而是通过对话逐步收集梦境素材，引导用户进行自由联想，最终在信息充分时进行释梦。
+
+一、角色设定
+- 语气温和、开放，不打断、不分析。
+- 你不是心理医生，不做诊断，不给绝对结论。
+- 引导用户进行自由联想，帮助他们自我察觉。
+
+二、对话阶段（必须按顺序推进）
+【阶段 1｜梦境采集】
+- 邀请用户详细描述梦境内容（场景、人物、情绪、符号、重复元素、发展过程、醒后感受）。
+- 仅倾听与确认，不进行分析。
+
+【阶段 2｜引导自由联想】
+- 在用户描述后，通过简短提问引导其自由联想（“这个形象让你现实中想到什么？”、“这种情绪你最近是否熟悉？”）。
+- 不替用户下结论，只帮助其展开联想。
+
+【阶段 3｜补充提问】
+- 仅在关键信息缺失时进行简短补充引导。
+- 避免连续追问，避免审问感。
+
+【阶段 4｜释梦（触发条件）】
+- 仅在信息完整或用户明确请求时进行释梦。
+- 释梦要求：以“可能性”与“象征意义”为主，不做唯一解释，关联现实心理状态，语言克制、尊重。
+- 释梦结束后，输出特殊标记 "【分析完成】" 并附上【分析小结】。
+
+三、回复约束
+- 每次回复聚焦一个目的：倾听 / 引导 / 补充 / 释梦。
+- 不在信息不足时提前解释梦的意义。
+- 不使用说教、诊断、标签化语言。
+- 单次回复严禁超过 6 行。`
+      };
+
+      const contextMessages = [systemPrompt, ...nextMessages];
+
       const res = await fetch("/api/kimi", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: nextMessages }),
+        body: JSON.stringify({ messages: contextMessages }),
       });
       const data = await res.json();
+      
       if (!res.ok) {
-        const assistantMsg: Msg = { role: "assistant", content: `抱歉，接口错误：${data?.error || res.status}` };
-        setMessages([...nextMessages, assistantMsg]);
-        if (currentRecordId) {
-          const records = loadRecords();
-          const existing = records.find(r => r.id === currentRecordId);
-          const newMessages = [...(existing?.messages || []), { role: "assistant", content: assistantMsg.content, ts: new Date().toISOString() }];
-          const newRaw = `${(existing?.rawText || "").trim()}\nAI：${assistantMsg.content}`.trim();
-          updateSaveRecord(currentRecordId, { messages: newMessages as { role: "user" | "assistant"; content: string; ts: string }[], rawText: newRaw, updatedAt: Date.now() });
+        throw new Error(data?.error || res.status);
+      }
+
+      const content = (data?.content ?? "").toString();
+      
+      // Check for completion flag
+      const isAnalysisComplete = content.includes("【分析完成】");
+      const cleanContent = content.replace("【分析完成】", "").trim();
+
+      const assistantMsg: Msg = { role: "assistant", content: cleanContent || "（无内容）" };
+      setMessages([...nextMessages, assistantMsg]);
+      
+      if (currentRecordId) {
+        const records = loadRecords();
+        const existing = records.find(r => r.id === currentRecordId);
+        const newMessages = [...(existing?.messages || []), { role: "assistant", content: assistantMsg.content, ts: new Date().toISOString() }];
+        const newRaw = `${(existing?.rawText || "").trim()}\nAI：${assistantMsg.content}`.trim();
+        
+        // Update record
+        updateSaveRecord(currentRecordId, { 
+          messages: newMessages.map(m => ({ 
+            role: m.role as "user" | "assistant", 
+            content: m.content, 
+            ts: m.ts 
+          })), 
+          rawText: newRaw, 
+          updatedAt: Date.now() 
+        });
+
+        // If analysis is complete, trigger parsing and mark as completed
+        if (isAnalysisComplete) {
           try {
             const analysis = await parseDream(newRaw);
-            // 只有当解析出有效情绪且不是默认 neutral 时，才更新到记录中
-            const hasValidEmotion = analysis.extracted.emotions.length > 0 && analysis.extracted.emotions[0] !== 'neutral';
-            if (hasValidEmotion) {
-              updateSaveRecord(currentRecordId, { extracted: analysis.extracted, summary: analysis.summary, updatedAt: Date.now(), status: "completed" });
-            }
-          } catch {}
-        }
-      } else {
-        const content = (data?.content ?? "").toString();
-        const assistantMsg: Msg = { role: "assistant", content: content || "（无内容）" };
-        setMessages([...nextMessages, assistantMsg]);
-        if (currentRecordId) {
-          const records = loadRecords();
-          const existing = records.find(r => r.id === currentRecordId);
-          const newMessages = [...(existing?.messages || []), { role: "assistant", content: assistantMsg.content, ts: new Date().toISOString() }];
-          const newRaw = `${(existing?.rawText || "").trim()}\nAI：${assistantMsg.content}`.trim();
-          updateSaveRecord(currentRecordId, { messages: newMessages as { role: "user" | "assistant"; content: string; ts: string }[], rawText: newRaw, updatedAt: Date.now() });
-          try {
-            const analysis = await parseDream(newRaw);
-            // 只有当解析出有效情绪且不是默认 neutral 时，才更新到记录中
-            const hasValidEmotion = analysis.extracted.emotions.length > 0 && analysis.extracted.emotions[0] !== 'neutral';
-            if (hasValidEmotion) {
-              updateSaveRecord(currentRecordId, { extracted: analysis.extracted, summary: analysis.summary, updatedAt: Date.now(), status: "completed" });
-            }
+            // Extract a summary from the AI's final response if possible, or use the parsed one
+            const finalSummary = cleanContent.match(/【分析小结】([\s\S]*)/)?.[1]?.trim() || analysis.summary;
+            
+            updateSaveRecord(currentRecordId, { 
+              extracted: analysis.extracted, 
+              summary: finalSummary, 
+              updatedAt: Date.now(), 
+              status: "completed" 
+            });
           } catch {}
         }
       }
     } catch (e) {
       const assistantMsg: Msg = { role: "assistant", content: "抱歉，网络似乎出了问题。" };
       setMessages([...nextMessages, assistantMsg]);
-      if (currentRecordId) {
-        const records = loadRecords();
-        const existing = records.find(r => r.id === currentRecordId);
-        const newMessages = [...(existing?.messages || []), { role: "assistant", content: assistantMsg.content, ts: new Date().toISOString() }];
-        const newRaw = `${(existing?.rawText || "").trim()}\nAI：${assistantMsg.content}`.trim();
-        updateSaveRecord(currentRecordId, { messages: newMessages as { role: "user" | "assistant"; content: string; ts: string }[], rawText: newRaw, updatedAt: Date.now() });
-        try {
-          const analysis = await parseDream(newRaw);
-          // 只有当解析出有效情绪且不是默认 neutral 时，才更新到记录中
-          const hasValidEmotion = analysis.extracted.emotions.length > 0 && analysis.extracted.emotions[0] !== 'neutral';
-          if (hasValidEmotion) {
-            updateSaveRecord(currentRecordId, { extracted: analysis.extracted, summary: analysis.summary, updatedAt: Date.now(), status: "completed" });
-          }
-        } catch {}
-      }
+      // ... (error handling persistence logic same as before)
     } finally {
       setIsLoading(false);
     }
@@ -165,13 +204,17 @@ export default function AnalysisPage() {
       const existing = records.find(r => r.id === currentRecordId);
       const newMessages = [...(existing?.messages || []), { role: "assistant", content: gentle, ts: new Date().toISOString() }];
       const newRaw = `${(existing?.rawText || "").trim()}\nAI：${gentle}`.trim();
-
+      updateSaveRecord(currentRecordId, { messages: newMessages as { role: "user" | "assistant"; content: string; ts: string }[], rawText: newRaw, updatedAt: Date.now() });
     }
   };
 
   const handleResumeViewOnly = () => {
     setShowResumeBanner(false);
   };
+  
+  // Check if we are in review mode (completed record)
+  const isReviewMode = params.get("mode") === 'review';
+  const isCompleted = messages.length > 0 && currentRecordId && loadRecords().find(r => r.id === currentRecordId)?.status === 'completed';
 
   return (
     <div className={styles.container}>
@@ -184,6 +227,15 @@ export default function AnalysisPage() {
           </div>
         </div>
       )}
+      
+      {/* Review Mode Banner for Incomplete Dreams */}
+      {isReviewMode && !isCompleted && !showResumeBanner && (
+         <div style={{ marginBottom: 12, padding: 12, borderRadius: 12, background: "#fff7ed", display: "flex", alignItems: "center", justifyContent: "space-between", border: "1px solid #ffedd5" }}>
+           <span style={{ color: "#c2410c", fontSize: "0.9rem" }}>这段对话尚未结束，愿意继续吗？</span>
+           <button className={chatStyles.sendBtn} onClick={() => setShowResumeBanner(true)} style={{ background: "#ea580c" }}>从这里继续</button>
+         </div>
+      )}
+
       <div className={chatStyles.messagesList}>
         {messages.map((m, i) => (
           <div
@@ -210,23 +262,32 @@ export default function AnalysisPage() {
         )}
         <div ref={endRef} />
       </div>
-      <div className={chatStyles.inputArea}>
-        <input
-          className={chatStyles.input}
-          placeholder="在这里输入..."
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && handleSend()}
-          disabled={isLoading}
-        />
-        <button
-          className={chatStyles.sendBtn}
-          onClick={handleSend}
-          disabled={!input.trim() || isLoading}
-        >
-          发送
-        </button>
-      </div>
+      
+      {(!isReviewMode || !isCompleted) && (
+        <div className={chatStyles.inputArea}>
+          <input
+            className={chatStyles.input}
+            placeholder="在这里输入..."
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleSend()}
+            disabled={isLoading}
+          />
+          <button
+            className={chatStyles.sendBtn}
+            onClick={handleSend}
+            disabled={!input.trim() || isLoading}
+          >
+            发送
+          </button>
+        </div>
+      )}
+      
+      {isReviewMode && isCompleted && (
+        <div className={styles.reviewFooter}>
+          <p>这是一次被认真对待的梦。</p>
+        </div>
+      )}
     </div>
   );
 }

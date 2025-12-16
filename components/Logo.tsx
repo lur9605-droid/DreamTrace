@@ -12,49 +12,50 @@ const Logo = ({ width = 40, height = 40, className = '' }: { width?: number; hei
     >
       <defs>
         <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#FFA07A" /> {/* Peach/Orange */}
-          <stop offset="50%" stopColor="#A893FF" /> {/* Purple */}
-          <stop offset="100%" stopColor="#4D5BCE" /> {/* Blue */}
+          <stop offset="0%" stopColor="#FFB385" /> {/* Soft Peach */}
+          <stop offset="50%" stopColor="#B39DDB" /> {/* Gentle Purple */}
+          <stop offset="100%" stopColor="#6495ED" /> {/* Calming Blue */}
         </linearGradient>
       </defs>
       
       {/* 
-        Outer Curve: 
-        Starts at top tip (48, 15), 
-        Curves out left to form moon back, 
-        Sweeps down and right into the bottom wave 
+        Refined Design based on "Dream Trace":
+        1. A soft arc (Trace) wrapping around a crescent moon.
+        2. Small star points for lightness.
+        3. Simple, plenty of whitespace, gentle curves.
       */}
+
+      {/* Crescent Moon: Thinner, elegant curve */}
       <path 
-        d="M48,15 C25,25 15,55 30,70 C45,85 70,65 95,80" 
+        d="M45,15 C30,25 25,50 35,65 C45,80 70,70 85,60" 
         stroke="url(#logoGradient)" 
-        strokeWidth="3"
+        strokeWidth="2.5"
         strokeLinecap="round"
         fill="none"
       />
 
-      {/* 
-        Inner Curve: 
-        Starts at top tip (48, 15), 
-        Curves inner left to form moon crescent, 
-        Sweeps right into the top wave (parallel to bottom)
-      */}
+      {/* Dream Trace: A gentle wave intersecting the moon, representing the journey */}
       <path 
-        d="M48,15 C38,35 38,55 50,62 C62,69 80,62 92,70" 
+        d="M20,55 C35,45 55,45 70,55 C80,62 90,55 95,45" 
         stroke="url(#logoGradient)" 
-        strokeWidth="3"
+        strokeWidth="2.5"
         strokeLinecap="round"
         fill="none"
+        opacity="0.8"
       />
 
-      {/* 4-Pointed Star (Sparkle) */}
+      {/* Main Star: Four-pointed, slightly offset */}
       <path 
-        d="M68,35 Q68,42 75,42 Q68,42 68,49 Q68,42 61,42 Q68,42 68,35" 
+        d="M65,25 Q65,30 70,30 Q65,30 65,35 Q65,30 60,30 Q65,30 65,25" 
         stroke="url(#logoGradient)" 
-        strokeWidth="3" 
+        strokeWidth="2" 
         strokeLinecap="round"
         strokeLinejoin="round"
         fill="none"
       />
+
+      {/* Tiny Distant Star (Dot) for balance */}
+      <circle cx="80" cy="20" r="1.5" fill="url(#logoGradient)" opacity="0.6" />
     </svg>
   );
 };

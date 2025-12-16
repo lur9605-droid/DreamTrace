@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import styles from './Header.module.css';
 import Logo from './Logo';
+import Link from 'next/link';
 
 const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -20,7 +21,9 @@ const Header: React.FC = () => {
       <div className={styles.container}>
         <div className={styles.logo}>
           <a href="/" className={styles.logoLink}>
-            <Logo width={40} height={32} className={styles.logoIcon} />
+            <div className={styles.logoWrapper}>
+              <Logo width={48} height={48} className={styles.logoIcon} />
+            </div>
             <span>梦迹 DreamTrace</span>
           </a>
         </div>

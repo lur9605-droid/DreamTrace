@@ -48,9 +48,20 @@ export default function DiaryPage() {
       
       <div className={styles.timeline}>
         {records.map((record, index) => {
-           // Get the first emotion or a default
-           const mainEmotion = record.extracted?.emotions?.[0];
-           const emotionLabel = typeof mainEmotion === 'string' ? mainEmotion : mainEmotion?.name;
+           // Determine display status (Strictly 3 states)
+           let displayStatus = '尚未理解';
+           if (record.status === 'completed') {
+             displayStatus = '已被回应';
+           } else if (record.status === 'in_progress') {
+             displayStatus = '正在倾听';
+           }
+
+           // Extract initial snippet (1-2 sentences)
+           const fullText = record.rawText || record.content || '';
+           // remove "User: " prefix if present
+           const cleanText = fullText.replace(/^用户：/, '').replace(/^AI：.*/s, ''); 
+           const sentences = cleanText.split(/[。！？\n]/).filter(Boolean);
+           const snippet = sentences.slice(0, 2).join('。') + (sentences.length > 2 || cleanText.length > 100 ? '...' : '');
            
            return (
             <div key={record.id} className={styles.timelineItem}>
@@ -58,33 +69,23 @@ export default function DiaryPage() {
                 {index % 3 === 0 ? '🌙' : index % 3 === 1 ? '✨' : '☁️'}
               </div>
               
-              <Link href={`/analysis?resume=${record.id}`} className={styles.card}>
-                <div className={styles.date}>{formatDate(record.createdAt)}</div>
-                <p className={styles.content}>
-                  {record.summary || record.rawText || record.content}
-                </p>
-                {(() => {
-                  const inferredInProgress = record.status === 'in_progress' || (!record.summary && !record.extracted);
-                  return (
-                    <span className={styles.stateHint}>
-                      {inferredInProgress ? '还可以继续聊聊' : '已生成解析'}
-                    </span>
-                  );
-                })()}
+              <Link href={`/analysis?resume=${record.id}&mode=review`} className={styles.card}>
+                <div className={styles.cardHeader}>
+                  <div className={styles.date}>{formatDate(record.createdAt)}</div>
+                  <div className={`${styles.statusBadge} ${styles[record.status === 'completed' ? 'statusCompleted' : record.status === 'in_progress' ? 'statusListening' : 'statusUnknown']}`}>
+                    {displayStatus}
+                  </div>
+                </div>
                 
-                {emotionLabel && emotionLabel !== 'neutral' && (
-                  <span 
-                    className={styles.emotionBadge}
-                    style={{ backgroundColor: getEmotionColor(emotionLabel) }}
-                  >
-                    {emotionLabel}
+                <p className={styles.snippet}>
+                  {snippet || '（无内容）'}
+                </p>
+                
+                <div className={styles.cardFooter}>
+                  <span className={styles.enterAction}>
+                    {record.status === 'completed' ? '回顾这次梦' : '继续这次对话'} →
                   </span>
-                )}
-                {(!emotionLabel || emotionLabel === 'neutral') && (
-                  <span className={styles.stateHint} style={{ marginLeft: 8 }}>
-                    {record.status === 'completed' ? '情绪未识别' : '未分析'}
-                  </span>
-                )}
+                </div>
               </Link>
             </div>
           );

@@ -70,32 +70,74 @@
   border: 1px solid rgba(255, 255, 255, 0.8);
 }
 
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
 .date {
-  color: #666;
-  font-size: 0.9rem;
-}
-
-.content {
-  color: #333;
-  line-height: 1.6;
-  font-size: 1rem;
-}
-
-.stateHint {
-  align-self: flex-start;
-  font-size: 0.85rem;
   color: #8fa0c0;
+  font-size: 0.85rem;
+  font-weight: 500;
 }
 
-.emotionBadge {
-  align-self: flex-end;
-  padding: 6px 16px;
-  border-radius: 20px;
-  font-size: 0.85rem;
-  color: #333;
+.statusBadge {
+  font-size: 0.75rem;
+  padding: 4px 10px;
+  border-radius: 999px;
   font-weight: 500;
-  background-color: #e0e0e0; /* Fallback */
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.statusCompleted {
+  background-color: #f0fdf4;
+  color: #166534;
+  border: 1px solid #dcfce7;
+}
+
+.statusListening {
+  background-color: #eff6ff;
+  color: #1e40af;
+  border: 1px solid #dbeafe;
+}
+
+.statusUnknown {
+  background-color: #f3f4f6;
+  color: #4b5563;
+  border: 1px solid #e5e7eb;
+}
+
+.snippet {
+  color: #374151;
+  line-height: 1.6;
+  font-size: 0.95rem;
+  margin-bottom: 16px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cardFooter {
+  display: flex;
+  justify-content: flex-end;
+  border-top: 1px solid #f1f5f9;
+  padding-top: 12px;
+}
+
+.enterAction {
+  font-size: 0.85rem;
+  color: #4D5BCE;
+  font-weight: 500;
+  transition: opacity 0.2s;
+}
+
+.card:hover .enterAction {
+  opacity: 0.8;
+  text-decoration: underline;
 }
 
 .emptyState {

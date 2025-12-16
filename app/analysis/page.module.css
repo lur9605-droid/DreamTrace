@@ -60,3 +60,14 @@
    0% { transform: rotate(0deg); }
    100% { transform: rotate(360deg); }
  }
+
+ .reviewFooter {
+   text-align: center;
+   color: #94a3b8;
+   font-size: 0.95rem;
+   padding: 20px;
+   margin-top: 12px;
+   background: #fcfdfe;
+   border-radius: 12px;
+   border: 1px dashed rgba(148, 163, 184, 0.2);
+ }

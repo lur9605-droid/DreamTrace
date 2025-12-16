@@ -27,6 +27,12 @@
   text-decoration: none;
 }
 
+.logoWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .logoIcon {
   display: block;
 }
