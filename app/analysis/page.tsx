@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, Suspense } from "react";
 import styles from "./page.module.css";
 import chatStyles from "../../components/ChatInterface.module.css";
 import { saveRecord, updateSaveRecord, loadRecords } from "@/lib/storage";
@@ -16,6 +16,14 @@ type Msg = {
 };
 
 export default function AnalysisPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <AnalysisContent />
+    </Suspense>
+  );
+}
+
+function AnalysisContent() {
   const [messages, setMessages] = useState<Msg[]>([
     { role: "assistant", content: "嗨，我在这里。愿意和我聊聊你昨晚的梦吗？" },
   ]);
