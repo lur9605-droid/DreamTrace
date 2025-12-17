@@ -6,6 +6,7 @@ import { saveRecord, updateSaveRecord, loadRecords } from "@/lib/storage";
 import { DreamRecord } from "@/lib/types";
 import { useSearchParams } from "next/navigation";
 import { parseDream } from "@/lib/mockAI";
+import BackButton from "@/components/BackButton";
 
 const uuidv4 = () => crypto.randomUUID();
 
@@ -176,8 +177,43 @@ export default function AnalysisPage() {
             // Extract a summary from the AI's final response if possible, or use the parsed one
             const finalSummary = cleanContent.match(/【分析小结】([\s\S]*)/)?.[1]?.trim() || analysis.summary;
             
+            // Call Emotion API
+            // Extract user content for better emotion analysis
+            const userContent = newMessages
+                .filter(m => m.role === 'user')
+                .map(m => m.content)
+                .join('\n');
+            
+            let emotionResult = null;
+            try {
+                const emotionRes = await fetch('/api/emotion', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ dreamText: userContent })
+                });
+                if (emotionRes.ok) {
+                    emotionResult = await emotionRes.json();
+                }
+            } catch (err) {
+                console.error("Emotion analysis failed", err);
+            }
+
+            // Merge emotion result
+            const finalExtracted = { ...analysis.extracted };
+            let primaryEmotion = null;
+            
+            if (emotionResult && emotionResult.primaryEmotion) {
+                primaryEmotion = emotionResult.primaryEmotion;
+                // Overwrite with the real emotion from AI
+                finalExtracted.emotions = [{
+                    name: emotionResult.primaryEmotion,
+                    score: emotionResult.confidence || 1
+                }];
+            }
+
             updateSaveRecord(currentRecordId, { 
-              extracted: analysis.extracted, 
+              extracted: finalExtracted, 
+              emotion: primaryEmotion, // Save to new top-level field
               summary: finalSummary, 
               updatedAt: Date.now(), 
               status: "completed" 
@@ -218,6 +254,7 @@ export default function AnalysisPage() {
 
   return (
     <div className={styles.container}>
+      <BackButton />
       {showResumeBanner && (
         <div style={{ marginBottom: 12, padding: 12, borderRadius: 12, background: "#f8fafc", display: "flex", gap: 8, alignItems: "center", justifyContent: "space-between" }}>
           <span style={{ color: "#64748b" }}>已恢复上次的梦境。</span>

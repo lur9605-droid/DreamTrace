@@ -1,9 +1,11 @@
 import React from 'react';
 import styles from './page.module.css';
+import BackButton from '@/components/BackButton';
 
 export default function AboutPage() {
   return (
     <div className={styles.container}>
+      <BackButton />
       <header className={styles.header}>
         <div className={styles.brand}>
           <span className={styles.logoIcon}>☁️</span>

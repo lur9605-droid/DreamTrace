@@ -21,6 +21,7 @@ export interface DreamRecord {
   extracted?: Extracted;
   status?: "in_progress" | "completed";
   messages?: { role: "user" | "assistant"; content: string; ts: string }[];
+  emotion?: string; // New primary emotion field
   // Legacy fields for backward compatibility
   date?: string; 
   title?: string;

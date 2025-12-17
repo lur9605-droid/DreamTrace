@@ -5,7 +5,7 @@ const Logo = ({ width = 40, height = 40, className = '' }: { width?: number; hei
     <svg 
       width={width} 
       height={height} 
-      viewBox="0 0 100 80" 
+      viewBox="0 0 120 100" 
       fill="none" 
       xmlns="http://www.w3.org/2000/svg"
       className={className}
@@ -19,43 +19,48 @@ const Logo = ({ width = 40, height = 40, className = '' }: { width?: number; hei
       </defs>
       
       {/* 
-        Refined Design based on "Dream Trace":
-        1. A soft arc (Trace) wrapping around a crescent moon.
-        2. Small star points for lightness.
-        3. Simple, plenty of whitespace, gentle curves.
+        New Design based on user request:
+        1. Crescent Moon on the left
+        2. Four-pointed Star on the right
+        3. Wavy lines below
       */}
 
-      {/* Crescent Moon: Thinner, elegant curve */}
+      {/* Crescent Moon */}
       <path 
-        d="M45,15 C30,25 25,50 35,65 C45,80 70,70 85,60" 
+        d="M50,15 C25,25 20,60 40,80 C25,65 25,30 50,15 Z" 
         stroke="url(#logoGradient)" 
-        strokeWidth="2.5"
-        strokeLinecap="round"
-        fill="none"
-      />
-
-      {/* Dream Trace: A gentle wave intersecting the moon, representing the journey */}
-      <path 
-        d="M20,55 C35,45 55,45 70,55 C80,62 90,55 95,45" 
-        stroke="url(#logoGradient)" 
-        strokeWidth="2.5"
-        strokeLinecap="round"
-        fill="none"
-        opacity="0.8"
-      />
-
-      {/* Main Star: Four-pointed, slightly offset */}
-      <path 
-        d="M65,25 Q65,30 70,30 Q65,30 65,35 Q65,30 60,30 Q65,30 65,25" 
-        stroke="url(#logoGradient)" 
-        strokeWidth="2" 
+        strokeWidth="3"
         strokeLinecap="round"
         strokeLinejoin="round"
         fill="none"
       />
 
-      {/* Tiny Distant Star (Dot) for balance */}
-      <circle cx="80" cy="20" r="1.5" fill="url(#logoGradient)" opacity="0.6" />
+      {/* Four-pointed Star */}
+      <path 
+        d="M80,35 Q85,35 85,30 Q85,35 90,35 Q85,35 85,40 Q85,35 80,35" 
+        stroke="url(#logoGradient)" 
+        strokeWidth="3" 
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        fill="none"
+      />
+
+      {/* Wavy Lines */}
+      <path 
+        d="M20,75 Q45,60 70,75 T110,85" 
+        stroke="url(#logoGradient)" 
+        strokeWidth="3"
+        strokeLinecap="round"
+        fill="none"
+      />
+      <path 
+        d="M35,85 Q55,75 75,85 T105,92" 
+        stroke="url(#logoGradient)" 
+        strokeWidth="3"
+        strokeLinecap="round"
+        fill="none"
+        opacity="0.7"
+      />
     </svg>
   );
 };

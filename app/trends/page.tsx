@@ -32,48 +32,52 @@ export default function TrendsPage() {
 
     // 2. Map to chart format
     return validRecords.map(r => {
-      const mainEmotion = r.extracted?.emotions[0];
-      const emotionName = typeof mainEmotion === 'string' ? mainEmotion : mainEmotion?.name;
+      // Prioritize r.emotion, then fallback to extracted emotions
+      const mainEmotion = r.emotion || (r.extracted?.emotions && (typeof r.extracted.emotions[0] === 'string' ? r.extracted.emotions[0] : r.extracted.emotions[0]?.name));
+      const emotionName = mainEmotion || '平静';
+      
       return {
         date: new Date(r.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-        value: getEmotionValue(emotionName || ''),
+        value: getEmotionValue(emotionName),
         emotion: emotionName,
-        color: getColorForEmotion(emotionName || ''),
+        color: getColorForEmotion(emotionName),
         summary: r.summary || '无摘要'
       };
     });
   }, [filteredRecords]);
 
   function getEmotionValue(emotion: string) {
-    const values: Record<string, number> = {
-      '快乐': 9, 'joy': 9,
-      '平静': 7, 'serene': 7,
-      'neutral': 5,
-      '焦虑': 3, 'anxiety': 3,
-      '悲伤': 2, 'sadness': 2,
-      '恐惧': 2, 'fear': 2,
-      '愤怒': 1, 'anger': 1
-    };
-    return values[emotion] || 5;
+    const e = emotion.toLowerCase();
+    
+    // High Energy / Positive (8-10)
+    if (['快乐', '开心', '愉悦', 'joy', 'happy', 'excited'].some(k => e.includes(k))) return 9;
+    
+    // Mid-High / Relaxed (6-7)
+    if (['平静', '宁静', '轻松', 'calm', 'serene', 'relaxed', 'content'].some(k => e.includes(k))) return 7;
+    
+    // Mid / Neutral (5)
+    if (['neutral', '中性'].some(k => e.includes(k))) return 5;
+    
+    // Low-Mid / Anxious (3-4)
+    if (['焦虑', '紧张', 'anxiety', 'nervous', 'tense'].some(k => e.includes(k))) return 3;
+    
+    // Low / Negative (1-2)
+    if (['悲伤', '难过', '恐惧', '害怕', '愤怒', 'sad', 'fear', 'anger'].some(k => e.includes(k))) return 2;
+    
+    return 5; // Default
   }
 
   function getColorForEmotion(emotion: string) {
-    const colors: Record<string, string> = {
-      '快乐': '#10b981',
-      '平静': '#3b82f6',
-      '焦虑': '#f59e0b',
-      '恐惧': '#ef4444',
-      '悲伤': '#6366f1',
-      '愤怒': '#dc2626',
-      'joy': '#10b981',
-      'serene': '#3b82f6',
-      'anxiety': '#f59e0b',
-      'fear': '#ef4444',
-      'sadness': '#6366f1',
-      'anger': '#dc2626',
-      'neutral': '#9ca3af'
-    };
-    return colors[emotion] || '#888888';
+    const e = emotion.toLowerCase();
+    
+    if (['快乐', 'joy'].some(k => e.includes(k))) return '#10b981';
+    if (['平静', 'serene', 'calm'].some(k => e.includes(k))) return '#3b82f6';
+    if (['焦虑', 'anxiety'].some(k => e.includes(k))) return '#f59e0b';
+    if (['恐惧', 'fear'].some(k => e.includes(k))) return '#ef4444';
+    if (['悲伤', 'sadness'].some(k => e.includes(k))) return '#6366f1';
+    if (['愤怒', 'anger'].some(k => e.includes(k))) return '#dc2626';
+    
+    return '#888888';
   }
 
   const keywordStats = useMemo(() => {

@@ -10,6 +10,9 @@ import BackButton from "@/components/BackButton";
 type EmotionName = string;
 
 const getEmotionNames = (record: DreamRecord): EmotionName[] => {
+  // Prioritize top-level emotion field
+  if (record.emotion) return [record.emotion];
+  
   const arr = record.extracted?.emotions || [];
   return arr.map((e) => (typeof e === "string" ? e : (e as EmotionLabel).name));
 };
@@ -75,7 +78,16 @@ function EmotionCurve({ records }: { records: DreamRecord[] }) {
   });
 
   const pointsRaw = sorted.map((r, idx) => {
-    const emotionName = (r.extracted?.emotions?.[0] && (typeof r.extracted!.emotions![0] === 'string' ? (r.extracted!.emotions![0] as string) : (r.extracted!.emotions![0] as EmotionLabel).name)) || "平静";
+    // Prioritize top-level emotion
+    let emotionName = r.emotion;
+    if (!emotionName) {
+         // Fallback to extracted emotions
+         const first = r.extracted?.emotions?.[0];
+         if (typeof first === 'string') emotionName = first;
+         else if (first && typeof first === 'object') emotionName = (first as EmotionLabel).name;
+    }
+    emotionName = emotionName || "平静";
+
     return {
       date: dateOf(r),
       emotion: emotionName,
