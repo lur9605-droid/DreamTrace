@@ -58,7 +58,7 @@ function EmotionCurve({ records }: { records: DreamRecord[] }) {
     const n = (name || "").toLowerCase();
     if (/愉悦|joy|快乐|excited|happy/.test(n)) return 4;
     if (/轻松|relax|relaxed|content/.test(n)) return 3;
-    if (/平静|宁静|calm|serene|neutral|peace/.test(n)) return 2;
+    if (/平静|宁静|calm|serene|neutral|peace|混合/.test(n)) return 2;
     if (/紧绷|焦虑|紧张|anxiety|fear|scared|nervous/.test(n)) return 1;
     if (/低落|sad|sadness|难过|悲伤|depressed|angry|愤怒/.test(n)) return 0;
     return 2;

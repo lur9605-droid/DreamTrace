@@ -20,28 +20,25 @@ export async function POST(req: Request) {
     const messages = [
       {
         role: "system",
-        content: `
-你是一位心理学取向的梦境情绪判断助手。
+        content: `你是一位敏锐的梦境情绪判断专家。
 请根据用户的梦境描述，判断其【主要情绪状态】。
 
-【规则】
+规则：
 1. 只能从以下情绪中选择一个作为 primaryEmotion：
    快乐、平静、焦虑、悲伤、恐惧、愤怒、混合
-2. 若存在明显多重或矛盾情绪，请选择「混合」
+2. 请非常敏锐地捕捉情绪线索：
+   - 如果梦境包含追逐、逃跑、不安、担心，请判断为「焦虑」或「恐惧」。
+   - 如果梦境包含哭泣、失去、遗憾，请判断为「悲伤」。
+   - 如果梦境包含攻击、争吵，请判断为「愤怒」。
+   - 只有在梦境确实非常安详、没有任何负面波动时，才选择「平静」。
 3. confidence 为 0~1 之间的小数
-4. ⚠️ 只输出 JSON，不要任何解释文字
-
-【输出示例】
-{
-  "primaryEmotion": "焦虑",
-  "confidence": 0.82
-}
-        `.trim(),
+4. 只输出 JSON`
       },
       {
         role: "user",
-        content: `梦境内容：\n"""${dreamText}"""`,
-      },
+        content: `梦境内容：
+"""${dreamText}"""`
+      }
     ];
 
     const resp = await fetch("https://api.moonshot.cn/v1/chat/completions", {
